@@ -1,0 +1,1 @@
+Norms: Build for docker, must be fully protected by Oauth2/OIDC provided by S NET (powered by Authentik),db is up to you. Name: Roast My Site

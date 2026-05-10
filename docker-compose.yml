@@ -1,0 +1,62 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-roast}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-roast}
+      POSTGRES_DB: ${POSTGRES_DB:-roast}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-roast} -d ${POSTGRES_DB:-roast}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    image: ghcr.io/snetv2/roast-api:${TAG:-latest}
+    pull_policy: ${PULL_POLICY:-always}
+    build: ./api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgres://${POSTGRES_USER:-roast}:${POSTGRES_PASSWORD:-roast}@db:5432/${POSTGRES_DB:-roast}
+      SESSION_SECRET: ${SESSION_SECRET}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL}
+      OIDC_ISSUER: ${OIDC_ISSUER}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET}
+      OIDC_REDIRECT_URI: ${OIDC_REDIRECT_URI}
+      OIDC_SCOPES: ${OIDC_SCOPES:-openid profile email groups}
+      ADMIN_ROLE: ${ADMIN_ROLE:-roast-admin}
+      CF_ACCOUNT_ID: ${CF_ACCOUNT_ID}
+      CF_API_TOKEN: ${CF_API_TOKEN}
+      LOGO_DIR: /data/logos
+    volumes:
+      - logo_data:/data/logos
+    ports:
+      - "${API_PORT:-3000}:3000"
+
+  web:
+    image: ghcr.io/snetv2/roast-web:${TAG:-latest}
+    pull_policy: ${PULL_POLICY:-always}
+    build:
+      context: ./web
+      args:
+        VITE_API_BASE: ${VITE_API_BASE:-/api}
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    environment:
+      API_UPSTREAM: http://api:3000
+
+volumes:
+  db_data:
+  logo_data:
