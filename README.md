@@ -20,7 +20,11 @@ All three run under `docker compose`. Nothing is reachable without a valid sessi
    - `SESSION_SECRET` — `openssl rand -hex 32`.
    - `PUBLIC_BASE_URL` — what the browser uses (e.g. `http://localhost:8080`). `OIDC_REDIRECT_URI` should be `${PUBLIC_BASE_URL}/api/auth/callback` and registered on the OIDC client.
 
-2. Build and start:
+2. Start the stack — by default it pulls prebuilt images from GHCR:
+   ```
+   docker compose up -d
+   ```
+   To build locally instead of pulling (useful while iterating before a release is published):
    ```
    docker compose up --build
    ```
@@ -51,11 +55,6 @@ Every push to `main` (and every `v*.*.*` tag) publishes two images via [.github/
 
 Tags produced: `latest` (main only), the branch name, `sha-<short>`, and the semver tag if pushed.
 
-To deploy from those images instead of building locally:
-
-```
-docker compose -f docker-compose.yml -f compose.prod.yml pull
-docker compose -f docker-compose.yml -f compose.prod.yml up -d
-```
+`docker-compose.yml` references these images directly (`ghcr.io/snetv2/roast-{api,web}:${TAG:-latest}`) with `pull_policy: always`, so `docker compose up -d` pulls fresh on every start. Pin to a specific release with `TAG=v1.2.3 docker compose up -d`. Pull on a schedule (or one-off) with `docker compose pull`.
 
 First publish: the packages will be **private** by default. Open `https://github.com/snetv2/roast/pkgs/container/roast-api` (and `roast-web`) and either flip them to public, or `docker login ghcr.io` on the host before pulling.
