@@ -1,9 +1,18 @@
 import { Router } from "express";
+import type { Session } from "express-session";
 import { env } from "../env.js";
 import { pool } from "../db.js";
 import { getOidcClient, newPkce, rolesFromClaims, type Claims } from "./oidc.js";
 
 export const authRouter = Router();
+
+// Save the session synchronously before redirecting, so the row is in
+// Postgres before the browser fires its next request to /auth/me.
+function saveSession(session: Session): Promise<void> {
+  return new Promise((resolve, reject) => {
+    session.save((err) => (err ? reject(err) : resolve()));
+  });
+}
 
 authRouter.get("/login", async (req, res, next) => {
   try {
@@ -22,6 +31,7 @@ authRouter.get("/login", async (req, res, next) => {
       state: pkce.state,
       nonce: pkce.nonce,
     });
+    await saveSession(req.session);
     res.redirect(url);
   } catch (e) {
     next(e);
@@ -60,6 +70,7 @@ authRouter.get("/callback", async (req, res, next) => {
     req.session.user = { sub, email, name, isAdmin, roles };
     const returnTo = pkce.returnTo ?? "/";
     delete req.session.pkce;
+    await saveSession(req.session);
     res.redirect(returnTo);
   } catch (e) {
     next(e);
