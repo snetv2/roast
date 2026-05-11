@@ -1,5 +1,5 @@
 import { loginRedirect } from "../auth";
-import { SnetSignInButton, SnetFooter } from "../components/snet";
+import { SnetSignInButton, SnetFooter, VersionTag } from "../components/snet";
 
 export function Login() {
   return (
@@ -20,6 +20,7 @@ export function Login() {
         <SnetSignInButton onClick={loginRedirect} />
       </div>
       <SnetFooter />
+      <VersionTag />
     </div>
   );
 }

@@ -1,7 +1,11 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 ARG VITE_API_BASE=/api
+ARG APP_VERSION=dev
+ARG APP_SHA=
 ENV VITE_API_BASE=$VITE_API_BASE
+ENV VITE_APP_VERSION=$APP_VERSION
+ENV VITE_APP_SHA=$APP_SHA
 COPY package.json ./
 RUN npm install --no-audit --no-fund
 COPY tsconfig.json vite.config.ts index.html ./

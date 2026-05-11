@@ -49,6 +49,8 @@ services:
       context: ./web
       args:
         VITE_API_BASE: ${VITE_API_BASE:-/api}
+        APP_VERSION: ${APP_VERSION:-dev}
+        APP_SHA: ${APP_SHA:-}
     restart: unless-stopped
     depends_on:
       - api

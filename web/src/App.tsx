@@ -5,7 +5,7 @@ import { Login } from "./pages/Login";
 import { ScanDetail } from "./pages/ScanDetail";
 import { TechEdit } from "./pages/TechEdit";
 import { TechList } from "./pages/TechList";
-import { SnetWordmark } from "./components/snet";
+import { SnetWordmark, VersionTag } from "./components/snet";
 
 export function App() {
   const { user, loading, logout } = useAuth();
@@ -42,6 +42,7 @@ export function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+      <VersionTag />
     </div>
   );
 }

@@ -109,6 +109,23 @@ input:focus, textarea:focus {
   font-size: 0.8rem;
 }
 
+.version-tag {
+  position: fixed;
+  bottom: 0.5rem;
+  right: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+  opacity: 0.6;
+  pointer-events: none;
+}
+.version-tag code {
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+  font-size: 0.7rem;
+}
+
 /* ─── Login screen ────────────────────────────────────────────────── */
 
 .login-screen {
