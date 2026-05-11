@@ -13,6 +13,7 @@ app.set("trust proxy", 1);
 app.use(express.json({ limit: "256kb" }));
 
 const PgStore = connectPgSimpleFactory(session);
+const cookieSecure = new URL(env.PUBLIC_BASE_URL).protocol === "https:";
 app.use(
   session({
     name: "roast.sid",
@@ -20,10 +21,11 @@ app.use(
     secret: env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    proxy: cookieSecure,
     cookie: {
       httpOnly: true,
       sameSite: "lax",
-      secure: new URL(env.PUBLIC_BASE_URL).protocol === "https:",
+      secure: cookieSecure,
       maxAge: 8 * 60 * 60 * 1000,
     },
   }),
